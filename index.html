@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Поездки</title>
+  <style>
+    /* ========== GENERAL STYLES ========== */
+    :root {
+      --primary-color: #1e88e5;
+      --primary-hover: #1976d2;
+      --bg-light-blue: #F6FCFF;
+      --border-color: #e5e7eb;
+      --text-dark: #333333;
+      --text-gray: #6b7280;
+      --text-light-gray: #9ca3af;
+      --bg-white: #ffffff;
+      --bg-gray: #f3f4f6;
+      --bg-gray-hover: #e5e7eb;
+      --tooltip-bg: #1f2937;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius-sm: 0.25rem;
+      --radius-md: 0.375rem;
+      --transition-normal: all 0.2s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-white);
+      color: var(--text-dark);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* ========== HEADER STYLES ========== */
+    header {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+    }
+
+    .header-title {
+      font-size: 1.125rem;
+      font-weight: 500;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .blue-underline {
+      border-bottom: 2px solid var(--primary-color);
+      width: 80px;
+      margin-left: 1rem;
+    }
+
+    /* ========== MAIN CONTENT STYLES ========== */
+    .main-content {
+      padding: 1rem;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .create-trip-btn {
+      background-color: var(--primary-color);
+      color: var(--bg-white);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+      transition: var(--transition-normal);
+    }
+
+    .create-trip-btn:hover {
+      background-color: var(--primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .create-trip-btn:focus {
+      outline: 2px solid rgba(30, 136, 229, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* ========== FILTERS AREA STYLES ========== */
+    .filters-area {
+      background-color: var(--bg-light-blue);
+      margin: 0 -1rem;
+      padding: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .filter-label {
+      margin-right: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .date-input, .search-input {
+      padding: 0.35rem 0.5rem;
+      padding-right: 2rem;
+      border: 1px solid #d1d5db;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      transition: var(--transition-normal);
+    }
+
+    .date-input:focus, .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.25);
+    }
+
+    .date-input {
+      width: 130px;
+    }
+
+    .search-input {
+      width: 220px;
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .clear-icon {
+      right: 2rem;
+      cursor: pointer;
+    }
+
+    .reset-btn {
+      color: var(--primary-color);
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.875rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition-normal);
+    }
+
+    .reset-btn:hover {
+      background-color: rgba(30, 136, 229, 0.1);
+    }
+
+    .reset-btn:focus {
+      outline: 2px solid rgba(30, 136, 229, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* Custom checkbox styling */
+    .checkbox-container {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .checkbox {
+      opacity: 0;
+      position: absolute;
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    .checkbox-custom {
+      width: 1rem;
+      height: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.25rem;
+      display: inline-block;
+      margin-right: 0.5rem;
+      position: relative;
+    }
+
+    .checkbox:checked + .checkbox-custom {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .checkbox:checked + .checkbox-custom::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .checkbox:focus + .checkbox-custom {
+      box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.25);
+    }
+
+    .checkbox-label {
+      color: var(--text-gray);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ========== CARDS STYLES ========== */
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card {
+      background-color: var(--bg-white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: var(--transition-normal);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1rem;
+    }
+
+    .card-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field-label {
+      color: var(--text-gray);
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .field-value {
+      font-size: 0.875rem;
+    }
+
+    .trip-id {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: var(--transition-normal);
+    }
+
+    .trip-id:hover {
+      text-decoration: underline;
+    }
+
+    .city-value {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .info-icon {
+      cursor: help;
+      margin-left: 0.25rem;
+      display: inline-flex;
+      transition: var(--transition-normal);
+    }
+
+    .info-icon:hover {
+      color: var(--primary-color);
+    }
+
+    .documents-btn {
+      background-color: var(--bg-gray);
+      color: var(--text-gray);
+      border: 1px solid #d1d5db;
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 1rem;
+      font-size: 0.75rem;
+      float: right;
+      transition: var(--transition-normal);
+    }
+
+    .documents-btn:hover {
+      background-color: var(--bg-gray-hover);
+    }
+
+    .documents-btn:focus {
+      outline: 2px solid rgba(30, 136, 229, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* ========== TOOLTIP STYLES ========== */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltip-content {
+      visibility: hidden;
+      background-color: var(--tooltip-bg);
+      color: white;
+      text-align: left;
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      position: absolute;
+      z-index: 10;
+      bottom: 150%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      width: max-content;
+      max-width: 400px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .tooltip .tooltip-content::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -8px;
+      border-width: 8px;
+      border-style: solid;
+      border-color: var(--tooltip-bg) transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltip-content {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Line spacing for tooltip content */
+    .tooltip-content p {
+      line-height: 1.5;
+      margin-bottom: 0.25rem;
+    }
+
+    .tooltip-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ========== ICONS ========== */
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+    }
+
+    .logout-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .plus-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ========== RESPONSIVE STYLES ========== */
+    @media (max-width: 1024px) {
+      .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .card-field:nth-child(4), .card-field:nth-child(5), .card-field:nth-child(6) {
+        margin-top: 0.75rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .filters {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .checkbox-container {
+        margin-left: 0;
+        margin-top: 0.5rem;
+      }
+      
+      .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .card-field:nth-child(3), .card-field:nth-child(4), .card-field:nth-child(5), .card-field:nth-child(6) {
+        margin-top: 0.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .card-field:not(:first-child) {
+        margin-top: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="header-title">Поездки</div>
+      <div class="user-info">
+        <span>Заболоцкий К.О.</span>
+        <svg class="logout-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </div>
+    </div>
+    <div class="blue-underline"></div>
+  </header>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Мои поездки</h1>
+      <button class="create-trip-btn">
+        <svg class="plus-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Оформить поездку</span>
+      </button>
+    </div>
+
+    <!-- Filters and Cards with light blue background -->
+    <div class="filters-area">
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-group">
+          <span class="filter-label">Период с:</span>
+          <div class="input-wrapper">
+            <input type="text" class="date-input" value="22.02.2024">
+            <span class="input-icon clear-icon">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </span>
+            <span class="input-icon">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">по:</span>
+          <div class="input-wrapper">
+            <input type="text" class="date-input" placeholder="Выбрать...">
+            <span class="input-icon">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <div class="input-wrapper">
+            <input type="text" class="search-input" placeholder="Поиск...">
+            <span class="input-icon">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button class="reset-btn">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span>Сбросить все</span>
+        </button>
+
+        <div class="checkbox-container">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="showArchived" class="checkbox">
+            <span class="checkbox-custom"></span>
+            <label for="showArchived" class="checkbox-label">Показать архивные поездки</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="cards-container">
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000115</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000117</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000115</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000211</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000118</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000119</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000120</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-content">
+            <div class="card-grid">
+              <div class="card-field">
+                <div class="field-label">№ поездки</div>
+                <a href="#" class="trip-id field-value">000133</a>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Дата поездки</div>
+                <div class="field-value">22.02.2024 - 27.02.2024</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, план</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Сумма, факт</div>
+                <div class="field-value">29 400,00</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Город</div>
+                <div class="city-value field-value">Москва, Ярославль, Ижевск, Владимир</div>
+              </div>
+              
+              <div class="card-field">
+                <div class="field-label">Статус</div>
+                <div>
+                  <button class="documents-btn">Документы</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simple JavaScript for interactivity -->
+  <!-- <script>
+    const checkbox = document.getElementById('showArchived');
+    checkbox.addEventListener('change', function() {
+      console.log('Show archived trips: ' + this.checked);
+    });
+    
+    const clearIcon = document.querySelector('.clear-icon');
+    const dateInput = document.querySelector('.date-input');
+    if (clearIcon && dateInput) {
+      clearIcon.addEventListener('click', function() {
+        dateInput.value = '';
+      });
+    }
+    
+    const resetBtn = document.querySelector('.reset-btn');
+    resetBtn.addEventListener('click', function() {
+      const inputs = document.querySelectorAll('input');
+      inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+          input.checked = false;
+        } else {
+          input.value = '';
+        }
+      });
+      document.querySelector('.date-input').value = '22.02.2024';
+    });
+    
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  </script> -->
+</body>
+</html>
